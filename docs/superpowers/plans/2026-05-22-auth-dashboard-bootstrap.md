@@ -54,7 +54,7 @@
 - Create: `vitest.config.ts`
 - Modify: `package.json`
 
-- [ ] **Step 1: Add test scripts and dev dependencies**
+- [x] **Step 1: Add test scripts and dev dependencies**
 
 Update `package.json`:
 
@@ -85,7 +85,7 @@ npm install -D vitest @vue/test-utils jsdom
 
 Expected: packages install successfully and `package-lock.json` updates.
 
-- [ ] **Step 2: Create Vitest config and setup**
+- [x] **Step 2: Create Vitest config and setup**
 
 Create `vitest.config.ts`:
 
@@ -116,7 +116,7 @@ import { vi } from 'vitest'
 vi.stubGlobal('navigateTo', vi.fn())
 ```
 
-- [ ] **Step 3: Write the failing test for player/category defaults**
+- [x] **Step 3: Write the failing test for player/category defaults**
 
 Create `tests/unit/player-defaults.test.ts`:
 
@@ -165,7 +165,7 @@ describe('createDefaultCategories', () => {
 })
 ```
 
-- [ ] **Step 4: Run the test to verify it fails**
+- [x] **Step 4: Run the test to verify it fails**
 
 Run:
 
@@ -175,7 +175,7 @@ npx vitest run tests/unit/player-defaults.test.ts
 
 Expected: FAIL with module resolution error for `~/utils/player-defaults`.
 
-- [ ] **Step 5: Write the minimal types and factory helpers**
+- [x] **Step 5: Write the minimal types and factory helpers**
 
 Create `app/types/player.ts`:
 
@@ -261,7 +261,7 @@ export function createDefaultCategories(): CategoryDocument[] {
 }
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 Run:
 
@@ -271,7 +271,7 @@ npx vitest run tests/unit/player-defaults.test.ts
 
 Expected: PASS with 2 tests passed.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add package.json package-lock.json vitest.config.ts tests/setup.ts tests/unit/player-defaults.test.ts app/types/player.ts app/utils/player-defaults.ts
@@ -288,7 +288,7 @@ git commit -m "test: add player default factories"
 - Create: `tests/unit/firebase-config.test.ts`
 - Modify: `nuxt.config.ts`
 
-- [ ] **Step 1: Write the failing test for Firebase public config validation**
+- [x] **Step 1: Write the failing test for Firebase public config validation**
 
 Create `tests/unit/firebase-config.test.ts`:
 
@@ -327,7 +327,7 @@ describe('firebase config helpers', () => {
 })
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 
@@ -337,7 +337,7 @@ npx vitest run tests/unit/firebase-config.test.ts
 
 Expected: FAIL with module resolution error for `~/utils/firebase-config`.
 
-- [ ] **Step 3: Implement the config helper**
+- [x] **Step 3: Implement the config helper**
 
 Create `app/utils/firebase-config.ts`:
 
@@ -369,7 +369,7 @@ export function hasFirebasePublicConfig(config: FirebasePublicConfig): boolean {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run:
 
@@ -379,7 +379,7 @@ npx vitest run tests/unit/firebase-config.test.ts
 
 Expected: PASS with 2 tests passed.
 
-- [ ] **Step 5: Add the auth composable**
+- [x] **Step 5: Add the auth composable**
 
 Create `app/composables/useAuth.ts`:
 
@@ -434,7 +434,7 @@ export function useAuth() {
 }
 ```
 
-- [ ] **Step 6: Add a dev warning for missing config**
+- [x] **Step 6: Add a dev warning for missing config**
 
 Update `nuxt.config.ts` by filling `runtimeConfig.public` from env:
 
@@ -453,7 +453,7 @@ runtimeConfig: {
 
 Keep the existing `vuefire.config` block unchanged for now.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add app/utils/firebase-config.ts app/composables/useAuth.ts tests/unit/firebase-config.test.ts nuxt.config.ts
@@ -470,7 +470,7 @@ git commit -m "feat: add Firebase config guard and auth composable"
 - Modify: `app/utils/player-defaults.ts`
 - Test: `tests/unit/use-player.test.ts`
 
-- [ ] **Step 1: Extend the shared types for live reads**
+- [x] **Step 1: Extend the shared types for live reads**
 
 Update `app/types/player.ts`:
 
@@ -484,7 +484,7 @@ export interface CategoryRecord extends CategoryDocument {
 }
 ```
 
-- [ ] **Step 2: Write the failing test for player bootstrap**
+- [x] **Step 2: Write the failing test for player bootstrap**
 
 Create `tests/unit/use-player.test.ts`:
 
@@ -567,7 +567,7 @@ describe('usePlayer', () => {
 })
 ```
 
-- [ ] **Step 3: Run the test to verify it fails**
+- [x] **Step 3: Run the test to verify it fails**
 
 Run:
 
@@ -577,7 +577,7 @@ npx vitest run tests/unit/use-player.test.ts
 
 Expected: FAIL because `~/composables/usePlayer` does not exist yet.
 
-- [ ] **Step 4: Write the player bootstrap composable**
+- [x] **Step 4: Write the player bootstrap composable**
 
 Create `app/composables/usePlayer.ts`:
 
@@ -668,7 +668,7 @@ export function usePlayer() {
 }
 ```
 
-- [ ] **Step 5: Run the player bootstrap test to verify it passes**
+- [x] **Step 5: Run the player bootstrap test to verify it passes**
 
 Run:
 
@@ -678,7 +678,7 @@ npx vitest run tests/unit/use-player.test.ts
 
 Expected: PASS with 1 test passed.
 
-- [ ] **Step 6: Run the app type/build check**
+- [x] **Step 6: Run the app type/build check**
 
 Run:
 
@@ -688,7 +688,7 @@ npm run build
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add app/composables/usePlayer.ts app/types/player.ts app/utils/player-defaults.ts tests/unit/use-player.test.ts
@@ -706,7 +706,7 @@ git commit -m "feat: add player bootstrap composable"
 - Create: `tests/unit/auth-route.test.ts`
 - Create: `tests/unit/player-store.test.ts`
 
-- [ ] **Step 1: Write the failing test for route guard decisions**
+- [x] **Step 1: Write the failing test for route guard decisions**
 
 Create `tests/unit/auth-route.test.ts`:
 
@@ -725,7 +725,7 @@ describe('getProtectedRouteRedirect', () => {
 })
 ```
 
-- [ ] **Step 2: Run the guard test to verify it fails**
+- [x] **Step 2: Run the guard test to verify it fails**
 
 Run:
 
@@ -735,7 +735,7 @@ npx vitest run tests/unit/auth-route.test.ts
 
 Expected: FAIL with module resolution error for `~/utils/auth-route`.
 
-- [ ] **Step 3: Implement the route helper**
+- [x] **Step 3: Implement the route helper**
 
 Create `app/utils/auth-route.ts`:
 
@@ -749,7 +749,7 @@ export function getProtectedRouteRedirect(path: string, isAuthenticated: boolean
 }
 ```
 
-- [ ] **Step 4: Write the failing test for the player store**
+- [x] **Step 4: Write the failing test for the player store**
 
 Create `tests/unit/player-store.test.ts`:
 
@@ -815,7 +815,7 @@ describe('usePlayerStore', () => {
 })
 ```
 
-- [ ] **Step 5: Run the store test to verify it fails**
+- [x] **Step 5: Run the store test to verify it fails**
 
 Run:
 
@@ -825,7 +825,7 @@ npx vitest run tests/unit/player-store.test.ts
 
 Expected: FAIL because `~/stores/player` does not exist yet.
 
-- [ ] **Step 6: Implement the player store**
+- [x] **Step 6: Implement the player store**
 
 Create `app/stores/player.ts`:
 
@@ -874,7 +874,7 @@ export const usePlayerStore = defineStore('player', {
 })
 ```
 
-- [ ] **Step 7: Implement the middleware**
+- [x] **Step 7: Implement the middleware**
 
 Create `app/middleware/auth.ts`:
 
@@ -891,7 +891,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 })
 ```
 
-- [ ] **Step 8: Run the tests to verify they pass**
+- [x] **Step 8: Run the tests to verify they pass**
 
 Run:
 
@@ -901,7 +901,7 @@ npx vitest run tests/unit/auth-route.test.ts tests/unit/player-store.test.ts
 
 Expected: PASS with all tests green.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add app/stores/player.ts app/utils/auth-route.ts app/middleware/auth.ts tests/unit/auth-route.test.ts tests/unit/player-store.test.ts
@@ -919,7 +919,7 @@ git commit -m "feat: add player store and auth route guard"
 - Create: `tests/components/player-overview.test.ts`
 - Create: `tests/components/category-grid.test.ts`
 
-- [ ] **Step 1: Write the failing test for the player overview component**
+- [x] **Step 1: Write the failing test for the player overview component**
 
 Create `tests/components/player-overview.test.ts`:
 
@@ -957,7 +957,7 @@ describe('PlayerOverview', () => {
 })
 ```
 
-- [ ] **Step 2: Write the failing test for the category grid**
+- [x] **Step 2: Write the failing test for the category grid**
 
 Create `tests/components/category-grid.test.ts`:
 
@@ -982,7 +982,7 @@ describe('CategoryGrid', () => {
 })
 ```
 
-- [ ] **Step 3: Run the component tests to verify they fail**
+- [x] **Step 3: Run the component tests to verify they fail**
 
 Run:
 
@@ -992,7 +992,7 @@ npx vitest run tests/components/player-overview.test.ts tests/components/categor
 
 Expected: FAIL because the new components do not exist yet.
 
-- [ ] **Step 4: Implement the player overview component**
+- [x] **Step 4: Implement the player overview component**
 
 Create `app/components/player/PlayerOverview.vue`:
 
@@ -1036,7 +1036,7 @@ defineProps<{
 </template>
 ```
 
-- [ ] **Step 5: Implement the category grid and quest empty state**
+- [x] **Step 5: Implement the category grid and quest empty state**
 
 Create `app/components/player/CategoryGrid.vue`:
 
@@ -1081,7 +1081,7 @@ Create `app/components/dashboard/DashboardQuestEmptyState.vue`:
 </template>
 ```
 
-- [ ] **Step 6: Run the component tests to verify they pass**
+- [x] **Step 6: Run the component tests to verify they pass**
 
 Run:
 
@@ -1091,7 +1091,7 @@ npx vitest run tests/components/player-overview.test.ts tests/components/categor
 
 Expected: PASS with both component tests green.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add app/components/player/PlayerOverview.vue app/components/player/CategoryGrid.vue app/components/dashboard/DashboardQuestEmptyState.vue tests/components/player-overview.test.ts tests/components/category-grid.test.ts
@@ -1106,7 +1106,7 @@ git commit -m "feat: add live dashboard presentation components"
 - Modify: `app/pages/index.vue`
 - Modify: `app/pages/dashboard.vue`
 
-- [ ] **Step 1: Replace the landing page CTA logic**
+- [x] **Step 1: Replace the landing page CTA logic**
 
 Update `app/pages/index.vue` `<script setup>`:
 
@@ -1165,7 +1165,7 @@ Update the main CTA button area:
 </p>
 ```
 
-- [ ] **Step 2: Replace the mock dashboard with live state**
+- [x] **Step 2: Replace the mock dashboard with live state**
 
 Update `app/pages/dashboard.vue` `<script setup>`:
 
@@ -1232,7 +1232,7 @@ Replace the template body with:
 </div>
 ```
 
-- [ ] **Step 3: Run the full test suite**
+- [x] **Step 3: Run the full test suite**
 
 Run:
 
@@ -1242,7 +1242,7 @@ npm test
 
 Expected: PASS with all unit and component tests green.
 
-- [ ] **Step 4: Run build and static generation**
+- [x] **Step 4: Run build and static generation**
 
 Run:
 
@@ -1253,7 +1253,7 @@ NITRO_TELEMETRY_DISABLED=1 NUXT_TELEMETRY_DISABLED=1 npm run generate
 
 Expected: PASS for both commands. `.output/public` is generated.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/pages/index.vue app/pages/dashboard.vue

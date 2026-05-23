@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import DashboardQuestEmptyState from '~/components/dashboard/DashboardQuestEmptyState.vue'
+import { ref } from 'vue'
+import DashboardQuestList from '~/components/dashboard/DashboardQuestList.vue'
+import QuestCreateModal from '~/components/quests/QuestCreateModal.vue'
 import CategoryGrid from '~/components/player/CategoryGrid.vue'
 import PlayerOverview from '~/components/player/PlayerOverview.vue'
 import GlowButton from '~/components/ui/GlowButton.vue'
 import { usePlayerStore } from '~/stores/player'
+import { useQuestStore } from '~/stores/quest'
 
 definePageMeta({ middleware: ['auth'] })
 
 const { currentUser, signOutUser } = useAuth()
 const playerStore = usePlayerStore()
+const questStore = useQuestStore()
+
+const isCreateModalOpen = ref(false)
 
 if (currentUser.value && (playerStore.player?.id !== currentUser.value.uid || playerStore.categories.length === 0)) {
   await playerStore.initializeForUser({
@@ -19,10 +25,26 @@ if (currentUser.value && (playerStore.player?.id !== currentUser.value.uid || pl
   })
 }
 
+if (currentUser.value && questStore.quests.length === 0 && !questStore.isLoading) {
+  await questStore.loadQuests(currentUser.value.uid)
+}
+
 async function handleSignOut() {
   await signOutUser()
   playerStore.clearPlayer()
+  questStore.clearQuests()
   await navigateTo('/')
+}
+
+async function handleToggleComplete(questId: string) {
+  if (!currentUser.value) return
+  await questStore.toggleQuestCompletion(currentUser.value.uid, questId)
+}
+
+async function handleCreateQuest(data: { title: string; categoryId: string; difficulty: number }) {
+  if (!currentUser.value) return
+  await questStore.createQuest(currentUser.value.uid, data)
+  isCreateModalOpen.value = false
 }
 </script>
 
@@ -55,7 +77,18 @@ async function handleSignOut() {
         <CategoryGrid :categories="playerStore.categories" />
       </section>
 
-      <DashboardQuestEmptyState />
+      <DashboardQuestList
+        :quests="questStore.todayQuests"
+        @toggle-complete="handleToggleComplete"
+        @open-create-modal="isCreateModalOpen = true"
+      />
+
+      <QuestCreateModal
+        v-if="isCreateModalOpen"
+        :categories="playerStore.categories"
+        @create-quest="handleCreateQuest"
+        @close="isCreateModalOpen = false"
+      />
     </template>
   </div>
 </template>
