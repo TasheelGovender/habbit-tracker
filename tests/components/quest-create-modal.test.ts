@@ -66,4 +66,31 @@ describe('QuestCreateModal', () => {
 
     expect(wrapper.emitted('close')).toBeTruthy()
   })
+
+  it('shows validation errors when submitting with empty fields', async () => {
+    const wrapper = mountModal()
+
+    await wrapper.find('form').trigger('submit')
+
+    expect(wrapper.emitted('create-quest')).toBeFalsy()
+    expect(wrapper.text()).toContain('Quest title is required')
+    expect(wrapper.text()).toContain('Please select a category')
+  })
+
+  it('displays error prop when provided', () => {
+    const wrapper = mount(QuestCreateModal, {
+      props: { categories, error: 'Firestore write failed' },
+      global: {
+        stubs: {
+          SystemWindow: { template: '<div><slot /></div>' },
+          GlowButton: {
+            template: '<button :type="type"><slot /></button>',
+            props: ['variant', 'size', 'type'],
+          },
+        },
+      },
+    })
+
+    expect(wrapper.text()).toContain('Firestore write failed')
+  })
 })

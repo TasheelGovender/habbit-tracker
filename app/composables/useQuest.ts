@@ -12,26 +12,10 @@ import {
 import { formatInTimeZone } from 'date-fns-tz'
 
 import type { QuestRecord } from '~/types/quest'
-import { calculateLevelUp, calculateXpReward } from '~/utils/xp'
+import { calculateLevelUp, calculateXpReward, reverseLevelUp } from '~/utils/xp'
 
 function getTodayString(timezone: string): string {
   return formatInTimeZone(new Date(), timezone, 'yyyy-MM-dd')
-}
-
-function reverseLevelUp(currentXp: number, xpToRemove: number, currentLevel: number): { xp: number; level: number } {
-  let xp = currentXp - xpToRemove
-  let level = currentLevel
-
-  while (xp < 0 && level > 1) {
-    level--
-    xp += 100
-  }
-
-  if (xp < 0) {
-    xp = 0
-  }
-
-  return { xp, level }
 }
 
 export function useQuest() {

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { QuestView } from '~/types/quest'
+import GlowButton from '~/components/ui/GlowButton.vue'
+import SystemWindow from '~/components/ui/SystemWindow.vue'
+import QuestCard from '~/components/quests/QuestCard.vue'
 
 defineProps<{
   quests: QuestView[]

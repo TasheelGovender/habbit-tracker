@@ -15,6 +15,7 @@ const playerStore = usePlayerStore()
 const questStore = useQuestStore()
 
 const isCreateModalOpen = ref(false)
+const createError = ref<string | null>(null)
 
 if (currentUser.value && (playerStore.player?.id !== currentUser.value.uid || playerStore.categories.length === 0)) {
   await playerStore.initializeForUser({
@@ -43,8 +44,15 @@ async function handleToggleComplete(questId: string) {
 
 async function handleCreateQuest(data: { title: string; categoryId: string; difficulty: number }) {
   if (!currentUser.value) return
-  await questStore.createQuest(currentUser.value.uid, data)
-  isCreateModalOpen.value = false
+  createError.value = null
+
+  try {
+    await questStore.createQuest(currentUser.value.uid, data)
+    isCreateModalOpen.value = false
+  }
+  catch (error) {
+    createError.value = error instanceof Error ? error.message : 'Failed to create quest. Please try again.'
+  }
 }
 </script>
 
@@ -86,8 +94,9 @@ async function handleCreateQuest(data: { title: string; categoryId: string; diff
       <QuestCreateModal
         v-if="isCreateModalOpen"
         :categories="playerStore.categories"
+        :error="createError"
         @create-quest="handleCreateQuest"
-        @close="isCreateModalOpen = false"
+        @close="isCreateModalOpen = false; createError = null"
       />
     </template>
   </div>

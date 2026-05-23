@@ -91,6 +91,29 @@ describe('usePlayerStore', () => {
     expect(store.error).toBeNull()
   })
 
+  it('applyQuestXpResult updates player and category XP/level', async () => {
+    const { usePlayerStore } = await import('~/stores/player')
+    const store = usePlayerStore()
+
+    store.player = buildPlayer('hunter-1')
+    store.categories = [buildCategory('strength'), buildCategory('focus')]
+
+    store.applyQuestXpResult({
+      playerXp: 75,
+      playerLevel: 2,
+      categoryId: 'strength',
+      categoryXp: 40,
+      categoryLevel: 3,
+    })
+
+    expect(store.player!.xp).toBe(75)
+    expect(store.player!.level).toBe(2)
+    expect(store.categories[0].xp).toBe(40)
+    expect(store.categories[0].level).toBe(3)
+    expect(store.categories[1].xp).toBe(0)
+    expect(store.categories[1].level).toBe(1)
+  })
+
   it('keeps the latest initializeForUser result when requests resolve out of order', async () => {
     const firstBootstrap = createDeferred<PlayerRecord>()
     const secondBootstrap = createDeferred<PlayerRecord>()

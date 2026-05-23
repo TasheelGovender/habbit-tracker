@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateLevelUp, calculateXpReward, calculateXpToNextLevel } from '~/utils/xp'
+import { calculateLevelUp, calculateXpReward, calculateXpToNextLevel, reverseLevelUp } from '~/utils/xp'
 
 describe('calculateXpReward', () => {
   it('returns base XP from difficulty alone when streak is 0', () => {
@@ -52,5 +52,32 @@ describe('calculateLevelUp', () => {
   it('works at higher levels', () => {
     const result = calculateLevelUp(95, 10, 10)
     expect(result).toEqual({ xp: 5, level: 11 })
+  })
+})
+
+describe('reverseLevelUp', () => {
+  it('subtracts XP without level change when XP stays positive', () => {
+    const result = reverseLevelUp(80, 30, 2)
+    expect(result).toEqual({ xp: 50, level: 2 })
+  })
+
+  it('drops a level when XP goes negative', () => {
+    const result = reverseLevelUp(10, 40, 2)
+    expect(result).toEqual({ xp: 70, level: 1 })
+  })
+
+  it('drops multiple levels for large XP removal', () => {
+    const result = reverseLevelUp(10, 250, 4)
+    expect(result).toEqual({ xp: 60, level: 1 })
+  })
+
+  it('floors at level 1 with 0 XP', () => {
+    const result = reverseLevelUp(10, 500, 2)
+    expect(result).toEqual({ xp: 0, level: 1 })
+  })
+
+  it('handles exact XP removal', () => {
+    const result = reverseLevelUp(50, 50, 3)
+    expect(result).toEqual({ xp: 0, level: 3 })
   })
 })

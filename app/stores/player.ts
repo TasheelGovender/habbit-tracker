@@ -65,6 +65,18 @@ export const usePlayerStore = defineStore('player', {
         }
       }
     },
+    applyQuestXpResult(result: { playerXp: number; playerLevel: number; categoryId: string; categoryXp: number; categoryLevel: number }) {
+      if (!this.player) return
+
+      this.player.xp = result.playerXp
+      this.player.level = result.playerLevel
+
+      const category = this.categories.find(c => c.id === result.categoryId)
+      if (category) {
+        category.xp = result.categoryXp
+        category.level = result.categoryLevel
+      }
+    },
     clearPlayer() {
       Object.assign(this, getInitialState())
     },

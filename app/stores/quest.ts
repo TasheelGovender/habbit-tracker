@@ -105,14 +105,13 @@ export const useQuestStore = defineStore('quest', {
         quest.completedDates = quest.completedDates.filter((d) => d !== today)
         quest.streak = Math.max(0, quest.streak - 1)
 
-        const category = playerStore.categories.find((c) => c.id === quest.categoryId)
-        if (category) {
-          category.xp = result.categoryXp
-          category.level = result.categoryLevel
-        }
-
-        playerStore.player.xp = result.playerXp
-        playerStore.player.level = result.playerLevel
+        playerStore.applyQuestXpResult({
+          playerXp: result.playerXp,
+          playerLevel: result.playerLevel,
+          categoryId: quest.categoryId,
+          categoryXp: result.categoryXp,
+          categoryLevel: result.categoryLevel,
+        })
       }
       else {
         const result = await completeQuest(uid, questId, quest.categoryId, quest.difficulty, quest.streak)
@@ -120,14 +119,13 @@ export const useQuestStore = defineStore('quest', {
         quest.completedDates = [...quest.completedDates, today]
         quest.streak = quest.streak + 1
 
-        const category = playerStore.categories.find((c) => c.id === quest.categoryId)
-        if (category) {
-          category.xp = result.categoryXp
-          category.level = result.categoryLevel
-        }
-
-        playerStore.player.xp = result.playerXp
-        playerStore.player.level = result.playerLevel
+        playerStore.applyQuestXpResult({
+          playerXp: result.playerXp,
+          playerLevel: result.playerLevel,
+          categoryId: quest.categoryId,
+          categoryXp: result.categoryXp,
+          categoryLevel: result.categoryLevel,
+        })
       }
     },
 
