@@ -12,6 +12,10 @@ const runtimeConfig = useRuntimeConfig()
 const { currentUser, isSigningIn, authError, signInWithGoogle } = useAuth()
 const playerStore = usePlayerStore()
 
+if (currentUser.value) {
+  await navigateTo('/dashboard')
+}
+
 const firebaseConfigMissing = computed(() => {
   return !runtimeConfig.public.firebaseApiKey || !runtimeConfig.public.firebaseProjectId
 })
@@ -51,7 +55,7 @@ async function handleGoogleSignIn() {
           <div class="space-y-3">
             <div class="flex flex-col gap-3 sm:flex-row">
               <GlowButton size="lg" @click="handleGoogleSignIn">
-                {{ isSigningIn ? 'Connecting...' : currentUser ? 'Continue to Dashboard' : 'Sign in with Google' }}
+                {{ isSigningIn ? 'Connecting...' : 'Sign in with Google' }}
               </GlowButton>
             </div>
 

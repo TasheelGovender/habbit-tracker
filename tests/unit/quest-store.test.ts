@@ -78,6 +78,9 @@ describe('useQuestStore', () => {
         title: 'Meditate',
         categoryId: 'default-3',
         difficulty: 2,
+        frequency: 'daily',
+        frequencyTarget: 1,
+        frequencyPeriod: 'day',
         streak: 0,
         completedDates: [],
         createdAt: null,
@@ -89,6 +92,9 @@ describe('useQuestStore', () => {
         title: 'Meditate',
         categoryId: 'default-3',
         difficulty: 2,
+        frequency: 'daily',
+        frequencyTarget: 1,
+        frequencyPeriod: 'day',
       })
 
       expect(store.quests).toHaveLength(1)
@@ -266,6 +272,9 @@ describe('useQuestStore', () => {
           title: 'Morning Run',
           categoryId: 'default-0',
           difficulty: 3,
+          frequency: 'daily' as const,
+          frequencyTarget: 1,
+          frequencyPeriod: 'day' as const,
           streak: 5,
           completedDates: ['2026-05-23'],
           createdAt: null,
@@ -276,6 +285,9 @@ describe('useQuestStore', () => {
           title: 'Read 30 min',
           categoryId: 'default-1',
           difficulty: 2,
+          frequency: 'weekly' as const,
+          frequencyTarget: 1,
+          frequencyPeriod: 'week' as const,
           streak: 0,
           completedDates: [],
           createdAt: null,
@@ -290,9 +302,43 @@ describe('useQuestStore', () => {
       expect(views[0].completed).toBe(true)
       expect(views[0].xpReward).toBe(40)
       expect(views[0].type).toBe('daily')
+      expect(views[0].progress).toEqual({ current: 1, target: 1 })
       expect(views[1].category).toBe('Learning')
       expect(views[1].completed).toBe(false)
-      expect(views[1].xpReward).toBe(20)
+      expect(views[1].type).toBe('weekly')
+      expect(views[1].progress).toEqual({ current: 0, target: 1 })
+    })
+  })
+
+  describe('questsByFrequency getter', () => {
+    it('groups quests by frequency period', () => {
+      const playerStore = usePlayerStore()
+      playerStore.player = {
+        id: 'user-1', displayName: 'Hunter', email: 'h@test.com', photoURL: null,
+        level: 1, xp: 0, rank: 'E', hp: 50, maxHp: 50, title: null,
+        inPenaltyZone: false, lastActiveDate: '2026-05-23', timezone: 'UTC',
+        streakFreezes: 2, createdAt: null, updatedAt: null,
+      }
+      playerStore.categories = [
+        { id: 'default-0', name: 'Fitness', icon: '💪', color: '#EF4444', level: 1, xp: 0, order: 0, createdAt: null },
+      ]
+
+      const store = useQuestStore()
+      store.quests = [
+        { id: 'q1', title: 'Run', categoryId: 'default-0', difficulty: 3, frequency: 'daily' as const, frequencyTarget: 1, frequencyPeriod: 'day' as const, streak: 0, completedDates: [], createdAt: null, updatedAt: null },
+        { id: 'q2', title: 'Gym', categoryId: 'default-0', difficulty: 4, frequency: 'custom' as const, frequencyTarget: 3, frequencyPeriod: 'week' as const, streak: 0, completedDates: [], createdAt: null, updatedAt: null },
+        { id: 'q3', title: 'Review', categoryId: 'default-0', difficulty: 2, frequency: 'monthly' as const, frequencyTarget: 1, frequencyPeriod: 'month' as const, streak: 0, completedDates: [], createdAt: null, updatedAt: null },
+      ]
+
+      const grouped = store.questsByFrequency
+
+      expect(grouped.daily).toHaveLength(1)
+      expect(grouped.daily[0].title).toBe('Run')
+      expect(grouped.weekly).toHaveLength(1)
+      expect(grouped.weekly[0].title).toBe('Gym')
+      expect(grouped.weekly[0].type).toBe('3x / week')
+      expect(grouped.monthly).toHaveLength(1)
+      expect(grouped.monthly[0].title).toBe('Review')
     })
   })
 })

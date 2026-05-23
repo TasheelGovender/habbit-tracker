@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import GlowButton from '~/components/ui/GlowButton.vue'
 import SystemWindow from '~/components/ui/SystemWindow.vue'
+import type { FrequencyPeriod, QuestFrequency } from '~/types/quest'
 
 const props = defineProps<{
   categories: Array<{ id: string; name: string }>
@@ -9,27 +10,56 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'create-quest': [data: { title: string; categoryId: string; difficulty: number }]
+  'create-quest': [data: {
+    title: string
+    categoryId: string
+    difficulty: number
+    frequency: QuestFrequency
+    frequencyTarget: number
+    frequencyPeriod: FrequencyPeriod
+  }]
   'close': []
 }>()
 
 const title = ref('')
 const categoryId = ref('')
 const difficulty = ref(1)
+const frequency = ref<QuestFrequency>('daily')
+const customTarget = ref(2)
+const customPeriod = ref<FrequencyPeriod>('week')
 const hasAttemptedSubmit = ref(false)
 
 const titleMissing = computed(() => hasAttemptedSubmit.value && !title.value.trim())
 const categoryMissing = computed(() => hasAttemptedSubmit.value && !categoryId.value)
+
+const frequencyPresets: { value: QuestFrequency; label: string }[] = [
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'custom', label: 'Custom' },
+]
+
+function resolveFrequency(): { frequencyTarget: number; frequencyPeriod: FrequencyPeriod } {
+  if (frequency.value === 'daily') return { frequencyTarget: 1, frequencyPeriod: 'day' }
+  if (frequency.value === 'weekly') return { frequencyTarget: 1, frequencyPeriod: 'week' }
+  if (frequency.value === 'monthly') return { frequencyTarget: 1, frequencyPeriod: 'month' }
+  return { frequencyTarget: customTarget.value, frequencyPeriod: customPeriod.value }
+}
 
 function handleSubmit() {
   hasAttemptedSubmit.value = true
 
   if (!title.value.trim() || !categoryId.value) return
 
+  const { frequencyTarget, frequencyPeriod } = resolveFrequency()
+
   emit('create-quest', {
     title: title.value.trim(),
     categoryId: categoryId.value,
     difficulty: difficulty.value,
+    frequency: frequency.value,
+    frequencyTarget,
+    frequencyPeriod,
   })
 }
 </script>
@@ -64,6 +94,46 @@ function handleSubmit() {
               </option>
             </select>
             <p v-if="categoryMissing" class="text-xs text-rose-300">Please select a category.</p>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs uppercase tracking-[0.24em] text-slate-400">Frequency</label>
+            <div class="flex gap-2">
+              <button
+                v-for="preset in frequencyPresets"
+                :key="preset.value"
+                type="button"
+                data-testid="frequency-button"
+                class="pixel-corners flex-1 border px-2 py-2 text-xs font-semibold uppercase tracking-[0.15em] transition"
+                :class="frequency === preset.value
+                  ? 'border-cyan-300/40 bg-cyan-400/20 text-cyan-100'
+                  : 'border-cyan-300/15 bg-slate-950/50 text-slate-400 hover:border-cyan-300/25'"
+                @click="frequency = preset.value"
+              >
+                {{ preset.label }}
+              </button>
+            </div>
+
+            <div v-if="frequency === 'custom'" class="flex items-center gap-2 pt-1">
+              <input
+                v-model.number="customTarget"
+                type="number"
+                min="1"
+                max="10"
+                data-testid="custom-target"
+                class="pixel-corners w-16 border border-cyan-300/15 bg-slate-950/70 px-2 py-2 text-center text-sm text-slate-100 outline-none transition focus:border-cyan-300/40"
+              />
+              <span class="text-xs text-slate-400">times per</span>
+              <select
+                v-model="customPeriod"
+                data-testid="custom-period"
+                class="pixel-corners border border-cyan-300/15 bg-slate-950/70 px-2 py-2 text-sm text-slate-100 outline-none transition focus:border-cyan-300/40"
+              >
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+              </select>
+            </div>
           </div>
 
           <div class="space-y-2">

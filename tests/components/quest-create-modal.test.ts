@@ -23,11 +23,12 @@ describe('QuestCreateModal', () => {
     })
   }
 
-  it('renders a form with title input, category select, and difficulty selector', () => {
+  it('renders a form with title input, category select, frequency buttons, and difficulty selector', () => {
     const wrapper = mountModal()
 
     expect(wrapper.find('input[type="text"]').exists()).toBe(true)
     expect(wrapper.find('select').exists()).toBe(true)
+    expect(wrapper.findAll('[data-testid="frequency-button"]')).toHaveLength(4)
     expect(wrapper.findAll('[data-testid="difficulty-button"]')).toHaveLength(5)
   })
 
@@ -41,12 +42,11 @@ describe('QuestCreateModal', () => {
     expect(categoryOptions[1].text()).toBe('Learning')
   })
 
-  it('emits create-quest with form data on submit', async () => {
+  it('emits create-quest with daily frequency by default', async () => {
     const wrapper = mountModal()
 
     await wrapper.find('input[type="text"]').setValue('Morning Run')
     await wrapper.find('select').setValue('default-0')
-    await wrapper.findAll('[data-testid="difficulty-button"]')[2].trigger('click')
 
     await wrapper.find('form').trigger('submit')
 
@@ -54,7 +54,55 @@ describe('QuestCreateModal', () => {
     expect(wrapper.emitted('create-quest')![0][0]).toEqual({
       title: 'Morning Run',
       categoryId: 'default-0',
-      difficulty: 3,
+      difficulty: 1,
+      frequency: 'daily',
+      frequencyTarget: 1,
+      frequencyPeriod: 'day',
+    })
+  })
+
+  it('emits create-quest with weekly frequency when selected', async () => {
+    const wrapper = mountModal()
+
+    await wrapper.find('input[type="text"]').setValue('Gym')
+    await wrapper.find('select').setValue('default-0')
+    await wrapper.findAll('[data-testid="frequency-button"]')[1].trigger('click')
+
+    await wrapper.find('form').trigger('submit')
+
+    expect(wrapper.emitted('create-quest')![0][0]).toMatchObject({
+      frequency: 'weekly',
+      frequencyTarget: 1,
+      frequencyPeriod: 'week',
+    })
+  })
+
+  it('shows custom fields when Custom frequency is selected', async () => {
+    const wrapper = mountModal()
+
+    expect(wrapper.find('[data-testid="custom-target"]').exists()).toBe(false)
+
+    await wrapper.findAll('[data-testid="frequency-button"]')[3].trigger('click')
+
+    expect(wrapper.find('[data-testid="custom-target"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="custom-period"]').exists()).toBe(true)
+  })
+
+  it('emits create-quest with custom frequency data', async () => {
+    const wrapper = mountModal()
+
+    await wrapper.find('input[type="text"]').setValue('Stretch')
+    await wrapper.find('select').setValue('default-0')
+    await wrapper.findAll('[data-testid="frequency-button"]')[3].trigger('click')
+    await wrapper.find('[data-testid="custom-target"]').setValue(3)
+    await wrapper.find('[data-testid="custom-period"]').setValue('week')
+
+    await wrapper.find('form').trigger('submit')
+
+    expect(wrapper.emitted('create-quest')![0][0]).toMatchObject({
+      frequency: 'custom',
+      frequencyTarget: 3,
+      frequencyPeriod: 'week',
     })
   })
 

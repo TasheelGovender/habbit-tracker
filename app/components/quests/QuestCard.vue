@@ -7,6 +7,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'toggle-complete': [questId: string]
+  'delete-quest': [questId: string]
 }>()
 </script>
 
@@ -37,12 +38,25 @@ const emit = defineEmits<{
               {{ quest.type }}
             </span>
           </div>
-          <p class="text-xs uppercase tracking-[0.22em] text-slate-400">
-            {{ quest.category }} · Difficulty {{ quest.difficulty }}
-          </p>
+          <div class="flex items-center gap-3">
+            <p class="text-xs uppercase tracking-[0.22em] text-slate-400">
+              {{ quest.category }} · Difficulty {{ quest.difficulty }}
+            </p>
+            <button
+              data-testid="delete-quest"
+              class="text-xs uppercase tracking-[0.2em] text-slate-500 transition hover:text-rose-300"
+              @click="emit('delete-quest', quest.id)"
+            >
+              Delete
+            </button>
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 text-xs uppercase tracking-[0.2em] text-slate-300 sm:text-right">
+        <div class="grid gap-2 text-xs uppercase tracking-[0.2em] text-slate-300 sm:text-right" :class="quest.progress.target > 1 ? 'grid-cols-3' : 'grid-cols-2'">
+          <div v-if="quest.progress.target > 1" data-testid="quest-progress">
+            <p class="text-slate-500">Progress</p>
+            <p class="mt-1 text-cyan-100">{{ quest.progress.current }} / {{ quest.progress.target }}</p>
+          </div>
           <div>
             <p class="text-slate-500">Streak</p>
             <p class="mt-1 text-cyan-100">{{ quest.streak }} days</p>

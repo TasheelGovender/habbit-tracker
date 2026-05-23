@@ -10,9 +10,13 @@ describe('QuestCard', () => {
     category: 'Fitness',
     categoryId: 'default-0',
     difficulty: 3,
+    frequency: 'daily' as const,
+    frequencyTarget: 1,
+    frequencyPeriod: 'day' as const,
     streak: 5,
     xpReward: 40,
     completed: false,
+    progress: { current: 0, target: 1 },
   }
 
   it('renders quest title, category, difficulty, streak, and xp reward', () => {
@@ -34,7 +38,7 @@ describe('QuestCard', () => {
 
   it('applies completed styling when completed', () => {
     const wrapper = mount(QuestCard, {
-      props: { quest: { ...baseQuest, completed: true } },
+      props: { quest: { ...baseQuest, completed: true, progress: { current: 1, target: 1 } } },
     })
     const article = wrapper.find('article')
 
@@ -49,5 +53,40 @@ describe('QuestCard', () => {
 
     expect(wrapper.emitted('toggle-complete')).toBeTruthy()
     expect(wrapper.emitted('toggle-complete')![0]).toEqual(['quest-1'])
+  })
+
+  it('hides progress column for single-target quests', () => {
+    const wrapper = mount(QuestCard, { props: { quest: baseQuest } })
+
+    expect(wrapper.find('[data-testid="quest-progress"]').exists()).toBe(false)
+  })
+
+  it('shows progress for multi-target quests', () => {
+    const wrapper = mount(QuestCard, {
+      props: {
+        quest: {
+          ...baseQuest,
+          type: '3x / week',
+          frequency: 'custom' as const,
+          frequencyTarget: 3,
+          frequencyPeriod: 'week' as const,
+          progress: { current: 2, target: 3 },
+        },
+      },
+    })
+
+    const progress = wrapper.find('[data-testid="quest-progress"]')
+    expect(progress.exists()).toBe(true)
+    expect(progress.text()).toContain('2 / 3')
+  })
+
+  it('emits delete-quest with quest id when delete button is clicked', async () => {
+    const wrapper = mount(QuestCard, { props: { quest: baseQuest } })
+    const deleteButton = wrapper.find('[data-testid="delete-quest"]')
+
+    await deleteButton.trigger('click')
+
+    expect(wrapper.emitted('delete-quest')).toBeTruthy()
+    expect(wrapper.emitted('delete-quest')![0]).toEqual(['quest-1'])
   })
 })

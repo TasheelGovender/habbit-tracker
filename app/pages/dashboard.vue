@@ -42,7 +42,12 @@ async function handleToggleComplete(questId: string) {
   await questStore.toggleQuestCompletion(currentUser.value.uid, questId)
 }
 
-async function handleCreateQuest(data: { title: string; categoryId: string; difficulty: number }) {
+async function handleDeleteQuest(questId: string) {
+  if (!currentUser.value) return
+  await questStore.deleteQuest(currentUser.value.uid, questId)
+}
+
+async function handleCreateQuest(data: { title: string; categoryId: string; difficulty: number; frequency: string; frequencyTarget: number; frequencyPeriod: string }) {
   if (!currentUser.value) return
   createError.value = null
 
@@ -86,8 +91,9 @@ async function handleCreateQuest(data: { title: string; categoryId: string; diff
       </section>
 
       <DashboardQuestList
-        :quests="questStore.todayQuests"
+        :quests-by-frequency="questStore.questsByFrequency"
         @toggle-complete="handleToggleComplete"
+        @delete-quest="handleDeleteQuest"
         @open-create-modal="isCreateModalOpen = true"
       />
 

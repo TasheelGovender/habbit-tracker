@@ -11,7 +11,7 @@ import {
 } from 'firebase/firestore'
 import { formatInTimeZone } from 'date-fns-tz'
 
-import type { QuestRecord } from '~/types/quest'
+import type { FrequencyPeriod, QuestFrequency, QuestRecord } from '~/types/quest'
 import { calculateLevelUp, calculateXpReward, reverseLevelUp } from '~/utils/xp'
 
 function getTodayString(timezone: string): string {
@@ -28,13 +28,23 @@ export function useQuest() {
 
   async function createQuest(
     uid: string,
-    data: { title: string; categoryId: string; difficulty: number },
+    data: {
+      title: string
+      categoryId: string
+      difficulty: number
+      frequency: QuestFrequency
+      frequencyTarget: number
+      frequencyPeriod: FrequencyPeriod
+    },
   ): Promise<QuestRecord> {
     const now = serverTimestamp()
     const questData = {
       title: data.title,
       categoryId: data.categoryId,
       difficulty: data.difficulty,
+      frequency: data.frequency,
+      frequencyTarget: data.frequencyTarget,
+      frequencyPeriod: data.frequencyPeriod,
       streak: 0,
       completedDates: [] as string[],
       createdAt: now,

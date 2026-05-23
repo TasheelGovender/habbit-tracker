@@ -3,8 +3,9 @@ import { formatInTimeZone } from 'date-fns-tz'
 
 import { useQuest } from '~/composables/useQuest'
 import { usePlayerStore } from '~/stores/player'
-import type { QuestRecord, QuestView } from '~/types/quest'
+import type { FrequencyPeriod, QuestFrequency, QuestRecord, QuestView } from '~/types/quest'
 import { calculateXpReward } from '~/utils/xp'
+import { getCompletionProgress, getFrequencyLabel, isQuestCompletedForPeriod } from '~/utils/quest-frequency'
 
 interface QuestState {
   quests: QuestRecord[]
@@ -36,19 +37,35 @@ export const useQuestStore = defineStore('quest', {
 
       return state.quests.map((quest) => {
         const category = playerStore.categories.find((c) => c.id === quest.categoryId)
+        const frequency = quest.frequency || 'daily'
+        const frequencyTarget = quest.frequencyTarget || 1
+        const frequencyPeriod = quest.frequencyPeriod || 'day'
+        const progress = getCompletionProgress(quest.completedDates, frequency, frequencyTarget, frequencyPeriod, today)
 
         return {
           id: quest.id,
           title: quest.title,
-          type: 'daily',
+          type: getFrequencyLabel(frequency, frequencyTarget, frequencyPeriod),
           category: category?.name ?? 'Unknown',
           categoryId: quest.categoryId,
           difficulty: quest.difficulty,
+          frequency,
+          frequencyTarget,
+          frequencyPeriod,
           streak: quest.streak,
           xpReward: calculateXpReward(quest.difficulty, quest.streak),
-          completed: quest.completedDates.includes(today),
+          completed: isQuestCompletedForPeriod(progress),
+          progress,
         }
       })
+    },
+    questsByFrequency(): { daily: QuestView[]; weekly: QuestView[]; monthly: QuestView[] } {
+      const quests = this.todayQuests
+      return {
+        daily: quests.filter((q) => q.frequencyPeriod === 'day'),
+        weekly: quests.filter((q) => q.frequencyPeriod === 'week'),
+        monthly: quests.filter((q) => q.frequencyPeriod === 'month'),
+      }
     },
   },
   actions: {
@@ -82,7 +99,14 @@ export const useQuestStore = defineStore('quest', {
       }
     },
 
-    async createQuest(uid: string, data: { title: string; categoryId: string; difficulty: number }) {
+    async createQuest(uid: string, data: {
+      title: string
+      categoryId: string
+      difficulty: number
+      frequency: QuestFrequency
+      frequencyTarget: number
+      frequencyPeriod: FrequencyPeriod
+    }) {
       const { createQuest } = useQuest()
       const quest = await createQuest(uid, data)
       this.quests.push(quest)
@@ -97,9 +121,9 @@ export const useQuestStore = defineStore('quest', {
 
       const timezone = playerStore.player.timezone || 'UTC'
       const today = getTodayString(timezone)
-      const isCompleted = quest.completedDates.includes(today)
+      const isCompletedToday = quest.completedDates.includes(today)
 
-      if (isCompleted) {
+      if (isCompletedToday) {
         const result = await uncompleteQuest(uid, questId, quest.categoryId, quest.difficulty, quest.streak)
 
         quest.completedDates = quest.completedDates.filter((d) => d !== today)

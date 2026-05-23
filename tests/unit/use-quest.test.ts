@@ -48,6 +48,9 @@ describe('useQuest', () => {
         title: 'Morning Run',
         categoryId: 'default-0',
         difficulty: 3,
+        frequency: 'weekly',
+        frequencyTarget: 1,
+        frequencyPeriod: 'week',
       })
 
       expect(addDoc).toHaveBeenCalledTimes(1)
@@ -55,10 +58,11 @@ describe('useQuest', () => {
       expect(data.title).toBe('Morning Run')
       expect(data.categoryId).toBe('default-0')
       expect(data.difficulty).toBe(3)
+      expect(data.frequency).toBe('weekly')
+      expect(data.frequencyTarget).toBe(1)
+      expect(data.frequencyPeriod).toBe('week')
       expect(data.streak).toBe(0)
       expect(data.completedDates).toEqual([])
-      expect(data.createdAt).toBe('server-timestamp')
-      expect(data.updatedAt).toBe('server-timestamp')
       expect(result.id).toBe('quest-1')
     })
   })

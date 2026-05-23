@@ -15,10 +15,21 @@ const stubs = {
   },
 }
 
+const emptyGroups = { daily: [], weekly: [], monthly: [] }
+
+function makeQuest(overrides = {}) {
+  return {
+    id: 'q1', title: 'Run', type: 'daily', category: 'Fitness', categoryId: 'd0',
+    difficulty: 3, frequency: 'daily', frequencyTarget: 1, frequencyPeriod: 'day',
+    streak: 0, xpReward: 30, completed: false, progress: { current: 0, target: 1 },
+    ...overrides,
+  }
+}
+
 describe('DashboardQuestList', () => {
-  it('shows empty state and create button when no quests exist', () => {
+  it('shows empty state when no quests in any group', () => {
     const wrapper = mount(DashboardQuestList, {
-      props: { quests: [] },
+      props: { questsByFrequency: emptyGroups },
       global: { stubs },
     })
 
@@ -26,26 +37,29 @@ describe('DashboardQuestList', () => {
     expect(wrapper.text()).toContain('New Quest')
   })
 
-  it('renders a QuestCard for each quest', () => {
-    const quests = [
-      { id: 'q1', title: 'Run', type: 'daily', category: 'Fitness', categoryId: 'd0', difficulty: 3, streak: 0, xpReward: 30, completed: false },
-      { id: 'q2', title: 'Read', type: 'daily', category: 'Learning', categoryId: 'd1', difficulty: 2, streak: 1, xpReward: 22, completed: true },
-    ]
-
+  it('renders quests grouped by frequency', () => {
     const wrapper = mount(DashboardQuestList, {
-      props: { quests },
+      props: {
+        questsByFrequency: {
+          daily: [makeQuest({ id: 'q1', title: 'Run' })],
+          weekly: [makeQuest({ id: 'q2', title: 'Gym', type: 'weekly', frequency: 'weekly', frequencyPeriod: 'week' })],
+          monthly: [],
+        },
+      },
       global: { stubs },
     })
 
-    const cards = wrapper.findAll('[data-testid="quest-card"]')
-    expect(cards).toHaveLength(2)
-    expect(cards[0].text()).toContain('Run')
-    expect(cards[1].text()).toContain('Read')
+    expect(wrapper.find('[data-testid="section-daily"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="section-weekly"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="section-monthly"]').exists()).toBe(false)
+
+    expect(wrapper.text()).toContain('Daily Quests (1)')
+    expect(wrapper.text()).toContain('Weekly Quests (1)')
   })
 
   it('emits open-create-modal when New Quest button is clicked', async () => {
     const wrapper = mount(DashboardQuestList, {
-      props: { quests: [] },
+      props: { questsByFrequency: emptyGroups },
       global: { stubs },
     })
 
@@ -55,12 +69,14 @@ describe('DashboardQuestList', () => {
   })
 
   it('forwards toggle-complete events from QuestCard', async () => {
-    const quests = [
-      { id: 'q1', title: 'Run', type: 'daily', category: 'Fitness', categoryId: 'd0', difficulty: 3, streak: 0, xpReward: 30, completed: false },
-    ]
-
     const wrapper = mount(DashboardQuestList, {
-      props: { quests },
+      props: {
+        questsByFrequency: {
+          daily: [makeQuest({ id: 'q1', title: 'Run' })],
+          weekly: [],
+          monthly: [],
+        },
+      },
       global: { stubs },
     })
 
